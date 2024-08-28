@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["es2018","DOM","DOM.Iterable" ],
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "types": ["vite/client", "node"],
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "noImplicitAny": false
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+  ],
+  "exclude": [
+    "node_modules",
+  ]
+}

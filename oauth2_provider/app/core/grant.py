@@ -102,7 +102,7 @@ class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
         if not auth_code:
             return None
 
-        if not auth_code.is_expired():
+        if auth_code.is_expired():
             self.delete_authorization_code(auth_code)
             return None
 

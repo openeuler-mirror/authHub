@@ -11,14 +11,11 @@
 # See the Mulan PSL v2 for more details.
 # ******************************************************************************/
 
-# marshmallow
+
 from marshmallow import Schema, fields, validate, ValidationError
 from vulcanus.restful.serialize.validate import ValidateRules
 
 class Oauth2ClientSchema(Schema):
-    """
-    validators for parameter of /user/account/change
-    """
     client_name = fields.String(required=True)
     client_uri = fields.URL(required=True)
     redirect_uris = fields.List(fields.URL(), required=True)

@@ -1,0 +1,12 @@
+uwsgi:
+  port: 11120
+  daemonize: /var/log/oauth2/uwsgi/oauthhub.log
+  processes: 1
+mysql:
+    host: 127.0.0.1
+    port: 3306
+    username: root
+    pool_size: 100
+    pool_recycle: 7200
+    database: oauth2
+    username: root

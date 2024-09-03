@@ -1,0 +1,15 @@
+[Unit]
+Description=authhub service
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/aops-cli service --name authhub 
+ExecStop=/usr/bin/aops-cli service --name authhub --stop
+Restart=on-failure
+RestartSec=1
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+

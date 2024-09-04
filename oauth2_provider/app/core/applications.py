@@ -45,7 +45,7 @@ class ApplicationProxy:
         client.username = data.get('username')
         client.client_id_issued_at = int(time.time())
         client.app_name = client_name
-        scopes_set = set({"username", "email", "openid", "phone", "offline_access"})
+        scopes_set = {"username", "email", "openid", "phone", "offline_access"}
         for scope_item in data.get('scope', []):
             scopes_set.add(scope_item)
         client.set_client_metadata({

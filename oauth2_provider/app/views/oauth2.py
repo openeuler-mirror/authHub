@@ -139,8 +139,11 @@ class OauthorizeView(BaseResponse, OAuth2):
             return self.redirect(redirect_url)
 
         if grant.client.skip_authorization or self.has_user_authorization(auth_request):
-            args = grant.create_authorization_response(redirect_uri, g.username)
-            return self.server.handle_response(*args)
+            # for example headers: [('Location', uri)]
+            status, payload, headers = grant.create_authorization_response(redirect_uri, g.username)
+            if "redirect_index" in request.args:
+                headers[-1] = ("Location", headers[-1][-1] + "&redirect_index=" + request.args["redirect_index"])
+            return self.server.handle_response(status, payload, headers)
 
         # check if user has already authorized this client
         return self.redirect(self.authorization_confirm_uri)

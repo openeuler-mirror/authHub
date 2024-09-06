@@ -28,10 +28,7 @@ class ApplicationsView(BaseResponse):
     @login_require
     def get(self):
         status_code, applications = ApplicationProxy().get_all_applications(g.username)
-        ret_data = {
-            "number": len(applications),
-            "applications": applications
-        }
+        ret_data = {"number": len(applications), "applications": applications}
         return self.response(code=status_code, data=ret_data)
 
 
@@ -55,34 +52,22 @@ class ApplicationsDetailView(BaseResponse):
 
     @login_require
     def get(self, client_id):
-        status_code, application = ApplicationProxy().get_one_application(
-            client_id=client_id,
-            username=g.username
-        )
+        status_code, application = ApplicationProxy().get_one_application(client_id=client_id, username=g.username)
         return self.response(code=status_code, data=application)
 
     @login_require
     @validate_request(schema=UpdateOauth2ClientSchema)
     def put(self, client_id, request_body, **params):
         status_code = ApplicationProxy().update_one_application(
-            username=g.username,
-            client_id=client_id,
-            data=request_body
+            username=g.username, client_id=client_id, data=request_body
         )
         if status_code != SUCCEED:
             return self.response(code=status_code, data=dict())
         else:
-            status_code, application = ApplicationProxy().get_one_application(
-                client_id=client_id,
-                username=g.username
-            )
+            status_code, application = ApplicationProxy().get_one_application(client_id=client_id, username=g.username)
             return self.response(code=status_code, data=application)
 
     @login_require
     def delete(self, client_id):
-        status_code = ApplicationProxy().delete_one_application(
-            client_id=client_id,
-            username=g.username
-        )
+        status_code = ApplicationProxy().delete_one_application(client_id=client_id, username=g.username)
         return self.response(code=status_code)
-

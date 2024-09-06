@@ -15,30 +15,24 @@
 from marshmallow import Schema, fields, validate, ValidationError
 from vulcanus.restful.serialize.validate import ValidateRules
 
+
 class Oauth2ClientSchema(Schema):
-    client_name = fields.String(required=True)
-    client_uri = fields.URL(required=True)
-    redirect_uris = fields.List(fields.URL(), required=True)
+    client_name = fields.String(required=True, validate=validate.Length(min=5, max=20))
+    client_uri = fields.URL(required=True, validate=validate.Length(min=5, max=255))
+    redirect_uris = fields.List(fields.URL(validate=validate.Length(min=5, max=255)), required=True)
     skip_authorization = fields.Boolean(default=True)
-    register_callback_uris = fields.List(fields.URL())
-    logout_callback_uris = fields.List(fields.URL())
+    register_callback_uris = fields.List(fields.URL(validate=validate.Length(min=5, max=255)))
+    logout_callback_uris = fields.List(fields.URL(validate=validate.Length(min=5, max=255)))
     scope = fields.List(
-        fields.String(validate=validate.OneOf(['username', 'email', 'openid', 'phone','offline_access'])),
-        required=True
+        fields.String(validate=validate.OneOf(['username', 'email', 'openid', 'phone', 'offline_access'])),
+        required=True,
     )
     grant_types = fields.List(
-        fields.String(
-            validate=validate.OneOf(["authorization_code", "client_credentials"])
-        ),
-        required=True
+        fields.String(validate=validate.OneOf(["authorization_code", "client_credentials"])), required=True
     )
-    response_types = fields.List(
-        fields.String(validate=validate.OneOf(['token','code'])),
-        required=True
-    )
+    response_types = fields.List(fields.String(validate=validate.OneOf(['token', 'code'])), required=True)
     token_endpoint_auth_method = fields.String(
-        required=True, 
-        validate=validate.OneOf(["client_secret_basic", "client_secret_post", "none"])
+        required=True, validate=validate.OneOf(["client_secret_basic", "client_secret_post", "none"])
     )
 
 
@@ -49,21 +43,13 @@ class UpdateOauth2ClientSchema(Schema):
     register_callback_uris = fields.List(fields.URL(), required=True)
     logout_callback_uris = fields.List(fields.URL(), required=True)
     scope = fields.List(
-        fields.String(validate=validate.OneOf(['username', 'email', 'openid', 'phone','offline_access'])),
-        required=True
+        fields.String(validate=validate.OneOf(['username', 'email', 'openid', 'phone', 'offline_access'])),
+        required=True,
     )
     grant_types = fields.List(
-        fields.String(
-            validate=validate.OneOf(["authorization_code", "client_credentials"])
-        ),
-        required=True
+        fields.String(validate=validate.OneOf(["authorization_code", "client_credentials"])), required=True
     )
-    response_types = fields.List(
-        fields.String(validate=validate.OneOf(['token','code'])),
-        required=True
-    )
+    response_types = fields.List(fields.String(validate=validate.OneOf(['token', 'code'])), required=True)
     token_endpoint_auth_method = fields.String(
-        required=True, 
-        validate=validate.OneOf(["client_secret_basic", "client_secret_post", "none"])
+        required=True, validate=validate.OneOf(["client_secret_basic", "client_secret_post", "none"])
     )
-

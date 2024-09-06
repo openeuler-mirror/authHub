@@ -22,7 +22,6 @@ from oauth2_provider.manage import db
 from vulcanus.conf import constant
 from vulcanus.log.log import LOGGER
 from vulcanus.restful.resp.state import (
-    AUTH_ERROR,
     DATA_EXIST,
     DATABASE_INSERT_ERROR,
     DATABASE_QUERY_ERROR,
@@ -244,43 +243,26 @@ class UserProxy:
             db.session.rollback()
             return DATABASE_UPDATE_ERROR
 
-    def logout(self, data) -> Tuple[str, str]:
+    def application_logout(self) -> Tuple[str, str]:
         """
         Logout the user for all related applicatioins.
-
-        Args:
-            data(dict): parameter, e.g.
-                {
-                    "client_id": "xxx",
-                    "token": "xxx",
-                }
 
         Returns:
             Tuple: [status code, username]
         """
-        client_id = data.get('client_id')
-        token = data.get("token")
         try:
-            # authhub manager user does not process application logout callback operations
-            if g.is_manage_user:
-                return SUCCEED, g.username
-            oauth2_token = db.session.query(OAuth2Token).filter_by(client_id=client_id, access_token=token).one()
-            if not oauth2_token:
-                LOGGER.error(f"cannot find the token for client_id: {client_id}")
-                return AUTH_ERROR, ""
-            username = oauth2_token.username
-            callback_res = self._logout_callback(username)
+            callback_res = self._logout_callback(g.username)
             if callback_res != SUCCEED:
-                return callback_res, ""
-            db.session.query(OAuth2Token).filter_by(username=username).delete(synchronize_session=False)
-            db.session.query(LoginRecords).filter_by(username=username).delete(synchronize_session=False)
+                return callback_res
+            db.session.query(OAuth2Token).filter_by(username=g.username).delete(synchronize_session=False)
+            db.session.query(LoginRecords).filter_by(username=g.username).delete(synchronize_session=False)
             db.session.commit()
         except sqlalchemy.exc.SQLAlchemyError as error:
             LOGGER.error(error)
             LOGGER.error("logout failed")
             db.session.rollback()
-            return LOGOUT_ERROR, ""
-        return SUCCEED, username
+            return LOGOUT_ERROR
+        return SUCCEED
 
     def _logout_callback(self, username: str) -> str:
         res = SUCCEED

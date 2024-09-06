@@ -41,7 +41,6 @@ CREATE TABLE IF NOT EXISTS `login_records` (
   `client_id` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   `logout_url` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `client_id` (`client_id`),
   CONSTRAINT `login_records_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `oauth2_client` (`client_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
@@ -53,7 +52,6 @@ CREATE TABLE IF NOT EXISTS `oauth2_client_scopes` (
   `grant_at` int NOT NULL,
   `expires_in` int NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `client_id` (`client_id`),
   CONSTRAINT `oauth2_client_scopes_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `oauth2_client` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
@@ -70,7 +68,6 @@ CREATE TABLE IF NOT EXISTS `oauth2_code` (
   `code_challenge` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `code_challenge_method` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE IF NOT EXISTS `oauth2_token` (
@@ -81,18 +78,15 @@ CREATE TABLE IF NOT EXISTS `oauth2_token` (
   `token_metadata` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `refresh_token_expires_in` int NOT NULL,
   `token_type` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `access_token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `refresh_token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `access_token` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `refresh_token` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   `scope` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `issued_at` int NOT NULL,
   `access_token_revoked_at` int NOT NULL,
   `refresh_token_revoked_at` int NOT NULL,
   `expires_in` int NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `access_token` (`access_token`),
   KEY `user_id` (`user_id`),
-  KEY `client_id` (`client_id`),
-  KEY `ix_oauth2_token_refresh_token` (`refresh_token`),
   CONSTRAINT `oauth2_token_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE,
   CONSTRAINT `oauth2_token_ibfk_2` FOREIGN KEY (`client_id`) REFERENCES `oauth2_client` (`client_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

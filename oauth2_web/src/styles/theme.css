@@ -1,0 +1,51 @@
+html {
+  --background-color: #ebebeb;
+  --background-secondary-color: #ffffff;
+  --background-third-color: #ebebeb;
+
+  --bg-drawer: #ffffff;
+  --bg-color: #ffffff;
+  --bg-hover: #eee;
+
+  --text-color: #000000;
+  --global-text-selection-bg: #8884;
+  --global-text-selection-text: #555;
+
+  --border-color: #eee;
+
+  --scrollbar-color: #9c9c9c00;
+  --scrollbar-color-hover: #9c9c9c;
+
+  --bg-basic-layout-header: #ffffff;
+  --bg-basic-layout-hover: #fcf3f3;
+
+  --box-shadow-color: #e7e7e7;
+
+  --openeuler-logo-filter: invert(0%);
+}
+
+html.dark {
+  --background-color: #090c10;
+  --background-secondary-color: #090c10;
+  --background-third-color: #111818;
+
+  --bg-drawer: #1f1f1f;
+  --bg-color: #231f20;
+  --bg-hover: #585656;
+
+  --text-color: #f0f2f8;
+  --global-text-selection-bg: #8884;
+  --global-text-selection-text: #bbb;
+
+  --border-color: #303030;
+
+  --scrollbar-color: #30363d00;
+  --scrollbar-color-hover: #30363d;
+
+  --bg-basic-layout-header: #141414;
+  --bg-basic-layout-hover: #333232;
+
+  --box-shadow-color: #272626;
+
+  --openeuler-logo-filter: invert(100%);
+}

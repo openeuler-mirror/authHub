@@ -11,6 +11,8 @@
 # See the Mulan PSL v2 for more details.
 # ******************************************************************************/
 
+from oauth2_provider.app.views.account import AddUser, ChangePassword, Login, Logout, ManagerLogin
+from oauth2_provider.app.views.applications import ApplicationsDetailView, ApplicationsRegisteView, ApplicationsView
 from oauth2_provider.app.views.oauth2 import (
     OauthIntrospectView,
     OauthorizeView,
@@ -20,10 +22,20 @@ from oauth2_provider.app.views.oauth2 import (
 )
 
 URLS = [
+    # applications
+    (ApplicationsView, "/oauth2/applications"),
+    (ApplicationsRegisteView, "/oauth2/applications/register"),
+    (ApplicationsDetailView, "/oauth2/applications/<string:client_id>"),
     # oauth2
     (OauthorizeView, "/oauth2/authorize"),
     (OauthTokenView, "/oauth2/token"),
     (OauthRevokeView, "/oauth2/revoke-token"),
     (OauthIntrospectView, "/oauth2/introspect"),
     (RefreshTokenView, "/oauth2/refresh-token"),
+    # account
+    (AddUser, "/oauth2/register"),
+    (ManagerLogin, "/oauth2/manager-login"),
+    (Login, "/oauth2/login"),
+    (Logout, "/oauth2/logout"),
+    (ChangePassword, "/oauth2/password"),
 ]

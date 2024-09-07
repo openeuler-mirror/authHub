@@ -8,7 +8,7 @@ Source0:	%{name}-%{version}.tar.gz
 Source1:	node_modules.tar.gz
 
 BuildRequires:  python3-setuptools
-Requires:  aops-vulcanus >= 2.1.0 python3-Authlib aops-zeus >= 2.1.0 
+Requires:  aops-vulcanus >= v2.1.0 python3-Authlib aops-zeus >= v2.1.0 
 Provides:  authhub
 
 %description

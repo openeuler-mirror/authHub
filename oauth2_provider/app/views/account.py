@@ -10,10 +10,10 @@
 # PURPOSE.
 # See the Mulan PSL v2 for more details.
 # ******************************************************************************/
-from flask import g, make_response
+from flask import g, make_response, request
 from oauth2_provider.app import cache
 from oauth2_provider.app.core.account import UserProxy
-from oauth2_provider.app.serialize.account import AddUserSchema, LoginSchema, LogoutSchema, ResetPasswordSchema
+from oauth2_provider.app.serialize.account import AddUserSchema, LoginSchema, ResetPasswordSchema
 from oauth2_provider.app.views import login_require, validate_request
 from vulcanus.restful.resp import state
 from vulcanus.restful.response import BaseResponse
@@ -123,25 +123,23 @@ class Logout(BaseResponse):
     """
 
     @login_require
-    @validate_request(schema=LogoutSchema)
-    def post(self, request_body, *args, **kwargs):
+    def get(self, *args, **kwargs):
         """
         Logout.
-
-        Args:
-            token(str): access token of client,
-            client_id(str): client id
 
         Returns:
             dict: response body
         """
-        logout_res, username = UserProxy().logout(request_body)
+        # authhub manager user does not process application logout callback operations
+        if g.is_manage_user:
+            cache.delete(g.username + "-manager-token")
+            return make_response(self.response(code=state.SUCCEED))
+        logout_res = UserProxy().application_logout()
         if logout_res != state.SUCCEED:
             return self.response(code=logout_res)
-        if g.is_manage_user:
-            cache.delete(username + "-manager-token")
-        else:
-            cache.delete(username + "-token")
-
+        cache.delete(g.username + "-token")
         response = make_response(self.response(code=state.SUCCEED))
+        response.set_cookie("Authorization", "", 0)
+        response.status_code = 302
+        response.headers['Location'] = request.args.get('redirect_uri')
         return response

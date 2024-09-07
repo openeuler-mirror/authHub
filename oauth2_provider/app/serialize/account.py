@@ -45,12 +45,3 @@ class ResetPasswordSchema(Schema):
     """
 
     username = fields.String(required=True, validate=validate.Length(min=5, max=20))
-
-
-class LogoutSchema(Schema):
-    """
-    validators for parameter of /oauth2/logout
-    """
-
-    token = fields.String(required=True, validate=validate.Length(min=1, max=255))
-    client_id = fields.String(required=True, validate=validate.Length(min=1, max=48))

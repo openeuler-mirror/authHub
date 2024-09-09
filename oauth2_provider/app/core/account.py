@@ -154,7 +154,7 @@ class UserProxy:
             str: status code
             dict: user_token, jwt token generated after validation
         """
-        login_res = self._login(self, is_manage_user=True, data=data)
+        login_res = self._login(is_manage_user=True, data=data)
         if login_res != SUCCEED:
             return login_res, ""
         # 2 hours expire
@@ -176,7 +176,7 @@ class UserProxy:
             str: status code
             user_token: jwt token generated after validation
         """
-        login_res = self._login(self, is_manage_user=False, data=data)
+        login_res = self._login(is_manage_user=False, data=data)
         if login_res != SUCCEED:
             return login_res, ""
         # 5 days expire
@@ -207,6 +207,7 @@ class UserProxy:
             LOGGER.error(error)
             LOGGER.error("user login failed.")
             return DATABASE_QUERY_ERROR
+        return SUCCEED
 
     def reset_password(self, data) -> str:
         """

@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `oauth2_code` (
   `auth_time` int  NOT NULL,
   `code_challenge` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `code_challenge_method` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE IF NOT EXISTS `oauth2_token` (

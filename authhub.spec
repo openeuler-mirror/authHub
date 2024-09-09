@@ -55,6 +55,7 @@ popd
 
 %files -n authhub-web
 %attr(0755, root, root) /opt/authhub/web/dist/*
+%attr(0755,root,root) %{_unitdir}/authhub-web.service
 
 %changelog
 * Mon Aug 19 2024 gongzhengtang<gong_zhengtang@163.com> - v1.0.0-1

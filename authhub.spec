@@ -1,6 +1,6 @@
 Name:		authhub
 Version:	v1.0.0
-Release:	1
+Release:	2
 Summary:	Authentication authority based on oauth2
 License:	MulanPSL2
 URL:		https://gitee.com/openeuler/%{name}
@@ -8,7 +8,7 @@ Source0:	%{name}-%{version}.tar.gz
 Source1:	node_modules.tar.gz
 
 BuildRequires:  python3-setuptools
-Requires:  aops-vulcanus >= v2.1.0 python3-Authlib aops-zeus >= v2.1.0 
+Requires:  aops-vulcanus >= v2.1.0 python3-Authlib aops-zeus >= v2.1.0 python3-Flask-SQLAlchemy
 Provides:  authhub
 
 %description
@@ -43,7 +43,10 @@ popd
 pushd oauth2_web
 mkdir -p %{buildroot}/opt/authhub/web/
 cp -r dist %{buildroot}/opt/authhub/web/
-cp deploy/authhub.nginx.conf /etc/nginx/conf.d/
+mkdir -p %{buildroot}/%{_sysconfdir}/nginx/conf.d/
+cp deploy/authhub.nginx.conf %{buildroot}/%{_sysconfdir}/nginx/conf.d/
+mkdir -p %{buildroot}/usr/lib/systemd/system
+cp -r deploy/authhub-web.service %{buildroot}/usr/lib/systemd/system/
 popd
 
 %files
@@ -58,6 +61,9 @@ popd
 %attr(0755,root,root) %{_unitdir}/authhub-web.service
 
 %changelog
+* Sat Aug 19 2024 gongzhengtang<gong_zhengtang@163.com> - v1.0.0-2
+- Add python3-Flask-SQLAlchemy requires
+
 * Mon Aug 19 2024 gongzhengtang<gong_zhengtang@163.com> - v1.0.0-1
 - Package init
 

@@ -15,6 +15,7 @@ import type {
 } from 'axios'
 import axios from 'axios'
 import { ElMessage, ElNotification } from 'element-plus'
+import router from '@/conf/router'
 
 
 export interface Result<T = any> {
@@ -62,7 +63,7 @@ request.interceptors.response.use(
             message: response.data.message,
           })
           setTimeout(() => {
-            window.location.href = '/oauth/authorize/login'
+            router.replace('/oauth/authorize/login')
           }, 1000)
           break
         default:

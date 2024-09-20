@@ -82,7 +82,7 @@ class AuthorizationServer(AuthlibAuthorizationServer):
             raise InvalidScopeError(state=state)
 
     def create_oauth2_request(self, request):
-        return OAuth2Request(flask_req)
+        return OAuth2Request(request)
 
     def create_bearer_token_generator(self, config):
         """Create a generator function for generating ``token`` value. This

@@ -31,6 +31,7 @@ from vulcanus.restful.resp import state
 from vulcanus.restful.response import BaseResponse
 from werkzeug.utils import cached_property, import_string
 
+from oauth2_provider.app import cache
 from oauth2_provider.app.constant import secret
 from oauth2_provider.app.core.token import jwt_token
 from oauth2_provider.app.serialize.oauth2 import OauthTokenIntrospectSchema, OauthTokenSchema, RefreshTokenSchema
@@ -100,6 +101,9 @@ class OauthorizeView(BaseResponse, OAuth2):
         try:
             token_info = jwt_token.decode(token=token, secret=secret)
             g.username = token_info["sub"]
+            cache_token = cache.get(token_info["sub"] + "-token")
+            if token != cache_token:
+                raise ValueError
             return True
         except ExpiredSignatureError as error:
             LOGGER.error("Signature has expired: %s" % token)

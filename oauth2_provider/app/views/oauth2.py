@@ -129,7 +129,7 @@ class OauthorizeView(BaseResponse, OAuth2):
             redirect_url = (
                 (request.args.get('redirect_to_url') or self.login_uri)
                 + "?authorization_uri="
-                + quote(auth_request.uri)
+                + quote(request.full_path)
             )
             if not self._validate_token(request.cookies.get('Authorization')):
                 raise InvalidTokenError("Invalid token")

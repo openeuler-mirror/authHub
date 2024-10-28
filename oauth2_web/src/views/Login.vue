@@ -80,7 +80,9 @@ async function login() {
   } else {
     const [_, res] = await api.login(form)
     if (res) {
-      window.location.href = authorizationUri as any
+      const url = new URL(window.location.href)
+      const authUrl = `${url.origin}${authorizationUri}`
+      window.location.href = authUrl
     }
   }
   isSubmiting.value = false

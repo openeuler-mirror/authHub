@@ -12,11 +12,10 @@
 # ******************************************************************************/
 import time
 from copy import deepcopy
-from typing import Tuple
 import sqlalchemy
 import sqlalchemy.exc
 from werkzeug.security import gen_salt
-from authlib.common.encoding import json_loads, json_dumps
+from authlib.common.encoding import json_dumps
 from vulcanus.conf import constant
 from vulcanus.log.log import LOGGER
 from vulcanus.restful.resp.state import (

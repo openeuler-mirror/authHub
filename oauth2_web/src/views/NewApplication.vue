@@ -49,14 +49,32 @@ const form = reactive<Form>({
 })
 
 const rules = reactive<FormRules<keyof Form>>({
-  clientName: [{ required: true, message: '请输入应用名称', trigger: 'blur' }],
-  clientUri: [{ required: true, message: '请输入应用地址', trigger: 'blur' }],
-  redirectUris: [{ required: true, message: '请输入应用回调地址', trigger: 'blur' }],
+  clientName: [{ validator: validateClientName, trigger: 'blur' }],
+  clientUri: [{ validator: validateRedirectUris, trigger: 'blur' }],
+  redirectUris: [{ validator: validateRedirectUris, trigger: 'blur' }],
 })
 
-const isSubmiting = ref(false)
+function validateClientName(_rule: any, value: any, callback: any): void {
+  const regex = /^.{5,20}$/i
+  if (!regex.test(value)) {
+    callback(new Error('应用名称长度必须在5-20之间!'))
+  }
+  callback()
+}
+
+function validateRedirectUris(_rule: any, value: any, callback: any): void {
+  const regex =
+    /^(((ht|f)tps?):\/\/)([^!@#$%^&*?.\s-]([^!@#$%^&*?.\s]{0,63}[^!@#$%^&*?.\s])?\.)+([a-z]{2,6})?\/?/
+  console.log(regex.test(value))
+  if (!regex.test(value)) {
+    callback(new Error('请输入正确的url!'))
+  }
+  callback()
+}
+
+const isSubmitting = ref(false)
 async function generateApplication() {
-  isSubmiting.value = true
+  isSubmitting.value = true
   const {
     clientName,
     clientUri,
@@ -86,7 +104,7 @@ async function generateApplication() {
     emits('success')
     emits('update:visible', false)
   }
-  isSubmiting.value = false
+  isSubmitting.value = false
 }
 
 async function handleSubmit() {
@@ -119,11 +137,7 @@ function handleClose() {
         <el-input v-model:model-value="form.clientUri" placeholder="应用主页" />
       </el-form-item>
       <el-form-item label="应用回调地址" prop="redirectUris">
-        <el-input
-          v-model:model-value="form.redirectUris"
-          type="textarea"
-          placeholder="应用回调地址"
-        />
+        <el-input v-model:model-value="form.redirectUris" placeholder="应用回调地址" />
       </el-form-item>
       <el-form-item label="用户知情同意页面" prop="shipAuthorization">
         <el-switch v-model:model-value="form.skipAuthorization" />
@@ -132,9 +146,10 @@ function handleClose() {
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="emits('update:visible', false)">取消</el-button>
-        <el-button :loading="isSubmiting" @click="handleSubmit" type="primary"> 创建 </el-button>
+        <el-button :loading="isSubmitting" @click="handleSubmit" type="primary"> 创建 </el-button>
       </div>
     </template>
   </el-dialog>
 </template>
 <style scoped></style>
+

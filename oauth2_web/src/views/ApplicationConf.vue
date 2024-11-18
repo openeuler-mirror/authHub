@@ -41,10 +41,54 @@ const originForm = reactive<Form>({
 })
 
 const rules = reactive<FormRules<keyof Form>>({
-  clientName: [{ required: true, message: '请输入应用名称', trigger: 'blur' }],
-  clientUri: [{ required: true, message: '请输入应用地址', trigger: 'blur' }],
-  redirectUris: [{ required: true, message: '请输入应用回调地址', trigger: 'blur' }],
+  clientName: [{ validator: validateClientName, trigger: 'blur' }],
+  clientUri: [{ validator: validateClientUri, trigger: 'blur' }],
+  redirectUris: [{ validator: validateRedirectUris, trigger: 'blur' }],
+  registerCallbackUris: [{ validator: validateCallbackUris, trigger: 'blur' }],
+  logoutCallbackUris: [{ required: false }, { validator: validateCallbackUris, trigger: 'blur' }],
 })
+
+const URL_REGEX =
+  /^(((ht|f)tps?):\/\/)([^!@#$%^&*?.\s-]([^!@#$%^&*?.\s]{0,63}[^!@#$%^&*?.\s])?\.)+([a-z]{2,6})?\/?/
+
+function validateClientName(_rule: any, value: any, callback: any): void {
+  const regex = /^.{5,20}$/i
+  if (!regex.test(value)) {
+    callback(new Error('应用名称长度必须在5-20之间!'))
+  }
+  callback()
+}
+
+function validateClientUri(_rule: any, value: any, callback: any): void {
+  if (!URL_REGEX.test(value)) {
+    callback(new Error('请输入正确的url!'))
+  }
+  callback()
+}
+
+function validateCallbackUris(_rule: any, value: any, callback: any): void {
+  if (value === '') {
+    callback()
+    return
+  }
+  const urlList = value.split(',')
+  const isRegex = urlList.some((url) => !URL_REGEX.test(url))
+  if (isRegex) {
+    callback(new Error('请输入正确的url!'))
+    return
+  }
+  callback()
+}
+
+function validateRedirectUris(_rule: any, value: any, callback: any): void {
+  const urlList = value.split(',')
+  const isRegex = urlList.some((url) => !URL_REGEX.test(url))
+  if (isRegex) {
+    callback(new Error('请输入正确的url!'))
+    return
+  }
+  callback()
+}
 
 const clientSecret = computed(() => {
   if (!props.application) return ''
@@ -258,3 +302,4 @@ watch(
   }
 }
 </style>
+

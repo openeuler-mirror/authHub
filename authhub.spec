@@ -1,6 +1,6 @@
 Name:		authhub
 Version:	v1.0.0
-Release:	2
+Release:	3
 Summary:	Authentication authority based on oauth2
 License:	MulanPSL2
 URL:		https://gitee.com/openeuler/%{name}
@@ -8,7 +8,7 @@ Source0:	%{name}-%{version}.tar.gz
 Source1:	node_modules.tar.gz
 
 BuildRequires:  python3-setuptools
-Requires:  aops-vulcanus >= v2.1.0 python3-Authlib aops-zeus >= v2.1.0 python3-Flask-SQLAlchemy
+Requires:  aops-vulcanus >= v2.1.0 python3-Authlib aops-zeus >= v2.1.0 python3-Flask-SQLAlchemy uwsgi
 Provides:  authhub
 
 %description
@@ -61,6 +61,9 @@ popd
 %attr(0755,root,root) %{_unitdir}/authhub-web.service
 
 %changelog
+* Wed Nov 20 2024 weidongkl<weidong@uniontech.com> - v1.0.0-3
+- Add uwsgi requires
+
 * Sat Aug 19 2024 gongzhengtang<gong_zhengtang@163.com> - v1.0.0-2
 - Add python3-Flask-SQLAlchemy requires
 

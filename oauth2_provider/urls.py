@@ -14,6 +14,7 @@
 from oauth2_provider.app.views.account import AddUser, ChangePassword, Login, Logout, ManagerLogin
 from oauth2_provider.app.views.applications import ApplicationsDetailView, ApplicationsRegisteView, ApplicationsView
 from oauth2_provider.app.views.oauth2 import (
+    AuthorizationStatusView,
     OauthIntrospectView,
     OauthorizeView,
     OauthRevokeView,
@@ -38,4 +39,5 @@ URLS = [
     (Login, "/oauth2/login"),
     (Logout, "/oauth2/logout"),
     (ChangePassword, "/oauth2/password"),
+    (AuthorizationStatusView, "/oauth2/login-status"),
 ]

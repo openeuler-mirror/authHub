@@ -34,9 +34,14 @@ from werkzeug.utils import cached_property, import_string
 from oauth2_provider.app import cache
 from oauth2_provider.app.constant import secret
 from oauth2_provider.app.core.token import jwt_token
-from oauth2_provider.app.serialize.oauth2 import OauthTokenIntrospectSchema, OauthTokenSchema, RefreshTokenSchema
+from oauth2_provider.app.serialize.oauth2 import (
+    AuthorizationStatusSchema,
+    OauthTokenIntrospectSchema,
+    OauthTokenSchema,
+    RefreshTokenSchema,
+)
 from oauth2_provider.app.views import login_require, validate_request
-from oauth2_provider.database.table import LoginRecords, OAuth2Client, OAuth2ClientScopes, OAuth2Token
+from oauth2_provider.database.table import LoginRecords, OAuth2Client, OAuth2ClientScopes, OAuth2Token, User
 from oauth2_provider.manage import db
 
 
@@ -159,7 +164,7 @@ class OauthTokenView(BaseResponse, OAuth2):
     """
 
     @validate_request(schema=OauthTokenSchema)
-    def post(self, *args, **kwargs):
+    def post(self, request_body, *args, **kwargs):
         """
         Verify the validity of code and return token
 
@@ -184,6 +189,17 @@ class OauthTokenView(BaseResponse, OAuth2):
             data = dict(access_token=response_data["access_token"], refresh_token=response_data["refresh_token"])
             if "id_token" in response_data:
                 data["id_token"] = response_data["id_token"]
+            # delete old token
+            client = OAuth2Client.query.filter_by(client_id=request_body["client_id"]).first()
+            token_info = jwt_token.decode(
+                token=response_data["access_token"], secret=client.client_secret, client=client.client_id
+            )
+            OAuth2Token.query.filter(
+                OAuth2Token.username == token_info["sub"],
+                OAuth2Token.client_id == request_body["client_id"],
+                OAuth2Token.access_token != response_data["access_token"],
+            ).delete()
+            db.session.commit()
             return self.response(code=state.SUCCEED, data=data)
         LOGGER.error("Validate code failed: %s", response_data["error"])
         return self.response(code=state.AUTH_ERROR, message=response_data["error"])
@@ -290,6 +306,70 @@ class RefreshTokenView(BaseResponse):
             return self.response(code=state.SUCCEED, data=dict(access_token=token.access_token))
         except (ExpiredSignatureError, ValueError) as error:
             return self.response(code=state.TOKEN_EXPIRE)
+        except SQLAlchemyError as error:
+            LOGGER.error(error)
+            return self.response(code=state.DATABASE_QUERY_ERROR)
+
+
+class AuthorizationStatusView(BaseResponse, OAuth2):
+    """
+    authorization status view
+    """
+
+    def _generate_token(self, user, client):
+        token = self.server.generate_token(grant_type="default", client=client, user=user)
+        auth_request = self.server.create_oauth2_request(request)
+        auth_request.user = user
+        auth_request.client = client
+        self.server.save_token(token, auth_request)
+        return token
+
+    @login_require
+    @validate_request(schema=AuthorizationStatusSchema)
+    def post(self, request_body, *args, **kwargs):
+        try:
+            login_record_count = LoginRecords.query.filter_by(username=g.username).count()
+            if not login_record_count:
+                return self.response(code=state.AUTH_ERROR)
+            # create a new token by client id and username
+            client_id = request_body["client_id"]
+            client = OAuth2Client.query.filter_by(client_id=client_id).one_or_none()
+            if not client:
+                return self.response(code=state.PARAM_ERROR, message="not a valid client")
+            user = User.query.filter_by(username=g.username).one_or_none()
+            login_records = LoginRecords.query.filter_by(
+                username=user.username, client_id=client.client_id
+            ).one_or_none()
+            if not login_records:
+                OAuth2Token.query.filter_by(username=user.username, client_id=client.client_id).delete()
+                token = self._generate_token(user, client)
+                # record login
+                login_records = LoginRecords(
+                    username=user.username,
+                    client_id=client.client_id,
+                    logout_url=",".join(client.logout_callback_uris),
+                    login_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                )
+                db.session.add(login_records)
+                db.session.commit()
+                LOGGER.info(f"Login records successfully: {g.username},client_id:{client.client_id}")
+                data = dict(access_token=token["access_token"], refresh_token=token["refresh_token"])
+                if "id_token" in token:
+                    data["id_token"] = token["id_token"]
+            else:
+                # query user tokens
+                user_oauth_token = OAuth2Token.query.filter_by(
+                    username=user.username, client_id=client.client_id
+                ).one_or_none()
+                if user_oauth_token:
+                    data = dict(
+                        access_token=user_oauth_token.access_token, refresh_token=user_oauth_token.refresh_token
+                    )
+                else:
+                    token = self._generate_token(user, client)
+                    data = dict(access_token=token["access_token"], refresh_token=token["refresh_token"])
+            return self.response(code=state.SUCCEED, data=data)
+
         except SQLAlchemyError as error:
             LOGGER.error(error)
             return self.response(code=state.DATABASE_QUERY_ERROR)

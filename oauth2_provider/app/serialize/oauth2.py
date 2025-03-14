@@ -40,3 +40,11 @@ class RefreshTokenSchema(Schema):
 
     refresh_token = fields.String(required=True, validate=validate.Length(min=1))
     client_id = fields.String(required=True, validate=validate.Length(min=1))
+
+
+class AuthorizationStatusSchema(Schema):
+    """
+    oauth2 authorization status schema
+    """
+
+    client_id = fields.String(required=True, validate=validate.Length(min=1))

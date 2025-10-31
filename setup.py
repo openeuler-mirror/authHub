@@ -19,7 +19,7 @@ setup(
     version='1.0.0',
     packages=find_packages(),
     install_requires=[
-        'marshmallow>=3.13.0',
+        'marshmallow==2.21.0',
         'Flask',
         'Flask-RESTful',
         'SQLAlchemy',

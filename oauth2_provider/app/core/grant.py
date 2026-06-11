@@ -45,8 +45,8 @@ class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
 
     def validate_requested_scope(self):
         """Validate if requested scope is supported by Authorization Server."""
-        scope = self.request.scope
-        state = self.request.state
+        scope = self.request.payload.scope
+        state = self.request.payload.state
         return self.server.validate_requested_scope(scope, state, self.request)
 
     def save_authorization_code(self, code, request):
@@ -63,13 +63,13 @@ class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
             if OAuth2AuthorizationCode.query.filter_by(code=code, client_id=request.client.client_id).one_or_none():
                 raise OAuth2Error('invalid_code')
 
-            code_challenge = request.data.get('code_challenge')
-            code_challenge_method = request.data.get('code_challenge_method')
+            code_challenge = request.payload.data.get('code_challenge')
+            code_challenge_method = request.payload.data.get('code_challenge_method')
             auth_code = OAuth2AuthorizationCode(
                 code=code,
                 client_id=request.client.client_id,
-                redirect_uri=request.redirect_uri,
-                scope=request.scope,
+                redirect_uri=request.payload.redirect_uri,
+                scope=request.payload.scope,
                 username=request.user,
                 code_challenge=code_challenge,
                 code_challenge_method=code_challenge_method,

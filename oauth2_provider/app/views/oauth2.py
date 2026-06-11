@@ -130,7 +130,7 @@ class OauthorizeView(BaseResponse, OAuth2):
         try:
             redirect_uri = grant.validate_authorization_request()
         except OAuth2Error as e:
-            LOGGER.error("Oauth2 error by client id: %s" % auth_request.client_id)
+            LOGGER.error("Oauth2 error by client id: %s" % auth_request.payload.client_id)
             return self.redirect(self.redirect_error_uri)
 
         # validate login user

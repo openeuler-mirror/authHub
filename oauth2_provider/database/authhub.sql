@@ -64,6 +64,8 @@ CREATE TABLE IF NOT EXISTS `oauth2_code` (
   `response_type` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `scope` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `nonce` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `acr` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `amr` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `auth_time` int  NOT NULL,
   `code_challenge` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `code_challenge_method` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,

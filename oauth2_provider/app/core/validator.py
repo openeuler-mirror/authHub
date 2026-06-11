@@ -58,7 +58,7 @@ class JWTBearerTokenValidator(_JWTBearerTokenValidator):
             raise InvalidTokenError("The token has been revoked")
 
         # Check that the token is by the client
-        if token.client_id != request.client_id:
+        if token.client_id != request.payload.client_id:
             raise InvalidTokenError("The token does not match the client")
 
         if self.scope_insufficient(token.get_scope(), scopes):

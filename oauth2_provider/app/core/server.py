@@ -11,6 +11,7 @@
 # See the Mulan PSL v2 for more details.
 # ******************************************************************************/
 from authlib.integrations.flask_oauth2 import AuthorizationServer as AuthlibAuthorizationServer
+from authlib.integrations.flask_oauth2.requests import FlaskOAuth2Payload
 from authlib.oauth2.rfc6749 import OAuth2Request as _OAuth2Request
 from authlib.oauth2.rfc6749.errors import InsecureTransportError, InvalidScopeError
 from authlib.oauth2.rfc6749.util import scope_to_list
@@ -22,13 +23,26 @@ from oauth2_provider.app.core.token import jwt_token
 from oauth2_provider.database.table import OAuth2ClientScopes
 
 
+class OAuth2Payload(FlaskOAuth2Payload):
+    def __init__(self, request: Request):
+        self._request = request
+
+    @property
+    def data(self):
+        values = dict(self._request.values)
+        json_data = self._request.get_json(silent=True)
+        if json_data:
+            values.update(json_data)
+        return values
+
+
 class OAuth2Request(_OAuth2Request):
     def __init__(self, request: Request):
         InsecureTransportError.check(request.url)
         #: HTTP method
         self.method = request.method
         self.uri = request.url
-        self.body = None
+        self.payload = OAuth2Payload(request)
         #: HTTP headers
         self.headers = request.headers or {}
 
@@ -46,11 +60,11 @@ class OAuth2Request(_OAuth2Request):
 
     @property
     def form(self):
-        return self._request.form or self._request.json
+        return self._request.form or self._request.get_json(silent=True)
 
     @property
     def data(self):
-        return self._request.values or self._request.json
+        return self._request.values or self._request.get_json(silent=True)
 
 
 class AuthorizationServer(AuthlibAuthorizationServer):
@@ -67,7 +81,7 @@ class AuthorizationServer(AuthlibAuthorizationServer):
                 self.scopes_supported = scope_to_list(request.client.scope)
             else:
                 oauth2_client_scopes = OAuth2ClientScopes.query.filter_by(
-                    username=request.user, client_id=request.client_id
+                    username=request.user, client_id=request.payload.client_id
                 ).one_or_none()
 
                 if oauth2_client_scopes:

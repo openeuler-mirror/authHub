@@ -3,7 +3,7 @@ Version:	v1.0.0
 Release:	3
 Summary:	Authentication authority based on oauth2
 License:	MulanPSL2
-URL:		https://gitee.com/openeuler/%{name}
+URL:		https://atomgit.com/openeuler/%{name}
 Source0:	%{name}-%{version}.tar.gz
 Source1:	node_modules.tar.gz
 
